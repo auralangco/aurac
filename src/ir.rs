@@ -1,19 +1,14 @@
 //! Definitions for the Aura Intermediate Representation (IR).
 
+mod program;
+
 /// A trait implemented by IR objects to compile to a given target language.
-pub trait Compilable {
+trait Compilable {
     // TODO: The target language as a type parameter?
 
     /// Compile the IR object to a target language.
     /// returns: The compiled code as a string.
     fn compile(&self) -> String;
-}
-
-pub struct Program {
-    /// Atoms are defined globally in the program.
-    /// A total of 2^64 atoms can be defined in a program.
-    pub atoms: Vec<Atom>,
-    pub program: Vec<Literal>,
 }
 
 /// The IR object for a primitive literal value.
@@ -51,29 +46,7 @@ impl Atom {
     }
 }
 
-impl Compilable for Program {
-    fn compile(&self) -> String {
-        let mut code = String::new();
-
-        code.push_str("#include <stdbool.h>\n");
-
-        code.push_str("// Section atoms\n");
-        for (i, atom) in self.atoms.iter().enumerate() {
-            code.push_str(&format!("#define {} {}\n", atom.repr, i));
-        }
-
-        code.push_str("\n// Section main\n");
-        code.push_str("int main() {\n");
-        for literal in &self.program {
-            code.push_str(&format!("{};\n", literal.compile()));
-        }
-        code.push_str("return 0;\n");
-        code.push_str("}\n");
-        code
-    }
-
-}
-
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -85,24 +58,5 @@ mod tests {
         assert_eq!(Literal::Bool(true).compile(), "true");
         assert_eq!(Literal::Bool(false).compile(), "false");
         assert_eq!(Literal::Atom(Atom::from_identifier("a")).compile(), "__Atom_A");
-    }
-
-    #[test]
-    fn test_program_compile() {
-        let program = Program {
-            atoms: vec![
-                Atom::from_identifier("a"),
-                Atom::from_identifier("b"),
-            ],
-            program: vec![
-                Literal::Atom(Atom::from_identifier("a")),
-                Literal::Int(42),
-                Literal::Float(3.14),
-                Literal::String("hello".into()),
-                Literal::Bool(true),
-            ],
-        };
-
-        println!("{}", program.compile());
     }
 }
