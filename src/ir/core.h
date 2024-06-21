@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 typedef bool Bool;
 typedef int32_t Int;
@@ -21,5 +22,9 @@ typedef double Float64;
 typedef char Char;
 typedef const char* String;
 typedef uint64_t Atom;
+
+void print(String str) {
+    printf("%s", str);
+}
 
 #endif // __AURA_CORE_H__
