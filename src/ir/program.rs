@@ -17,9 +17,26 @@ pub struct Program {
     pub main: Vec<Statement>,
 }
 
+/// The main section of the program.
+/// 
+/// The main section is the entry point of the program. Currently a list of statements to be ran
+pub struct Main {
+    pub statements: Vec<Statement>,
+}
+
+/// A statement in the program.
+/// 
+/// Statements are used only inside blocks.
 pub enum Statement {
     Expr(Expr),
     Bind{ident: Identifier, type_: Identifier, expr: Expr},
+}
+
+/// Stores the name of the atoms used in the program
+/// 
+/// The names are kebab-case strings without the atom prefix.
+pub struct Atoms {
+    pub atoms: Vec<String>,
 }
 
 impl Compilable for Program {
@@ -28,26 +45,36 @@ impl Compilable for Program {
 
         code.push_str(include_str!("core.h"));
 
-        code.push_str("\n// Section includes\n");
+        code.push_str("\n/* SECTION:: includes */\n");
         for include in &self.includes {
             code.push_str(&format!("#include \"{}\"\n", include));
         }
 
-        code.push_str("\n// Section atoms\n");
-        for (i, atom) in self.atoms.iter().enumerate() {
-            code.push_str(&format!("#define {} {}\n", atom.compile(), i));
-        }
+        // Compiles the program `atoms` section.
+        code.push_str("\n/* SECTION:: atoms */\n");
+        code.push_str(&self.atoms.compile());
 
-        code.push_str("\n// Section main\n");
+        // Compiles the program `main` section.
+        code.push_str("\n/* SECTION:: main */\n");
+        code.push_str(&self.main.compile());
+        
+        code
+    }
+
+}
+
+impl Compilable for Main {
+    fn compile(&self) -> String {
+        let mut code = String::new();
+
         code.push_str("int main() {\n");
-        for expr in &self.main {
+        for expr in &self.statements {
             code.push_str(&format!("{};\n", expr.compile()));
         }
         code.push_str("return 0;\n");
         code.push_str("}\n");
         code
     }
-
 }
 
 impl Compilable for Statement {
@@ -62,6 +89,18 @@ impl Compilable for Statement {
                 )
             }
         }
+    }
+}
+
+impl Compilable for Atoms {
+    fn compile(&self) -> String {
+        let mut code = String::new();
+
+        for (i, atom) in self.atoms.iter().enumerate() {
+            code.push_str(&format!("#define {} {}\n", atom, i));
+        }
+
+        code
     }
 }
 
