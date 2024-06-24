@@ -18,7 +18,6 @@
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
-- [Usage](#usage)
 - [Example Code](#example-code)
 - [Future Plans](#future-plans)
 - [Contributing](#contributing)
@@ -59,32 +58,22 @@ To get started with `aurac`, clone the repository and follow the instructions be
    cargo build
    ```
 
-## Usage
-
-To compile an Aura program, use the following command:
-
-```sh
-cargo run -- path/to/yourfile.aura
-```
-
-This will generate a C file from your Aura code, which can then be compiled using a C compiler like `gcc`.
-
 ## Example Code
 
 Here is a simple example of Aura code from the [Aura repository](https://github.com/auralangco/aura/blob/master/examples/core.aura):
 
 `Function to add two numbers`
+
 ```aura
-fn add(a: int, b: int): int {
-    return a + b;
-}
+fn add(a Int, b Int) -> Int = a + b;
 ```
 
 `Main function`
+
 ```aura
-fn main() {
-    let result = add(5, 7);
-    println("The result is {}", result);
+main {
+    result = add(5, 7);
+    println("The result is ${result}");
 }
 ```
 
